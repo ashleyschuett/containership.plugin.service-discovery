@@ -1,15 +1,27 @@
-var ContainershipPlugin = require("containership.plugin");
-var leader = require([__dirname, "lib", "leader"].join("/"));
-var follower = require([__dirname, "lib", "follower"].join("/"));
+'use strict';
+
+const follower = require('./lib/follower');
+const leader = require('./lib/leader');
+
+const ContainershipPlugin = require('containership.plugin');
 
 module.exports = new ContainershipPlugin({
-    type: "core",
+    type: 'core',
+
+    runLeader: function(core) {
+        leader.initialize(core);
+    },
+
+    runFollower: function(core) {
+        follower.initialize(core);
+    }
 
     initialize: function(core){
-        if(core.options.mode == "leader")
-            leader.initialize(core);
-        else
-            follower.initialize(core);
+        if(core.options.mode === 'leader') {
+            return module.exports.runLeader(core);
+        }
+
+        return module.exports.runFollower(core);
     },
 
     reload: function(){}
